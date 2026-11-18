@@ -1,30 +1,73 @@
 # Partner in Project
 
-**Student project & hackathon collaboration platform** — UCS503 Software Engineering Lab, Thapar Institute of Engineering & Technology.
+**Find teammates who actually fit.** A platform that helps students across colleges find teammates for projects, hackathons and research, matched by real skills and GitHub work.
 
-Students build profiles backed by their real GitHub work, discover collaborators across colleges, post hackathon/project/research team opportunities, apply and get matched with a transparent score, see what skills their team is missing, and chat in real time. Administrators moderate posts, reports and accounts.
+UCS503 Software Engineering Lab · Thapar Institute of Engineering & Technology · Batch 3C35
 
-> Stack (as specified in the SRS, QR10): **MERN** — MongoDB, Express, React, Node.js — written in TypeScript (compiles to JavaScript), with Tailwind CSS and Socket.IO.
+🔗 **Live:** https://partner-in-project.onrender.com
+*(Free hosting: the first load after a quiet period can take up to a minute while the server wakes up.)*
+
+**Try it:** sign up with your email or **Continue with Google**, or use a demo account:
+`ananya@demo.partnerinproject.app` / `DemoPass#2026` (a team leader with applications to review).
+Other demo users: `rahul`, `priya`, `arjun`, `sneha`, `kabir`, `meera`, `vikram`, `isha`, `dev`, `zoya`, `aman` @demo.partnerinproject.app, all with the same password.
+
+---
+
+## Why
+
+Students usually find teammates through WhatsApp groups and word of mouth, so teams end up random and skill gaps show up too late. Partner in Project:
+
+- builds profiles from **real GitHub work**, not just self-reported skills
+- gives every person and team a **transparent match score** with a plain-English explanation
+- tells a team exactly **which skills it is still missing**, and who could fill them
 
 ---
 
 ## Features
 
-| Area | What's implemented | SRS |
+| Area | What it does |
+|---|---|
+| **Accounts** | Email + password with 6-digit email OTP, **Continue with Google**, password reset, account lockout after 5 failed logins, rate limiting, 24 h secure sessions. Abandoned sign-ups can be restarted. |
+| **Verification** | "Verified Student" badge for institutional emails (`thapar.edu`, `*.ac.in`, `*.edu.in`, `*.edu`, …, managed by admins). |
+| **Profiles** | Photo (compressed in the browser), college, branch, year, bio, headline, interests, preferred roles, availability, skills wanted in teammates, projects, achievements, completeness checklist. |
+| **GitHub** | Connect with GitHub OAuth (verified) or a username. Shows **all** public repos with languages, topics, stars and forks; up to 6 featured; manual refresh plus 24 h auto-refresh; disconnect or change account. |
+| **Skills** | ~150 catalogued skills with aliases. Skills detected from GitHub (languages, topics, `package.json`, `requirements.txt`, `pom.xml`, `go.mod`, `Cargo.toml`, …) appear as **suggestions with evidence** to confirm or dismiss. Proficiency levels; manual skills are never removed by a sync. |
+| **Matching** | `50% skills + 20% interests + 15% role + 15% availability`, with a gauge, component bars, matched/missing skills and a readable reason. |
+| **Discover** | Find students across colleges, filtered by skill, interest, role, college, year and availability, ranked by match. |
+| **Team Finder** | Post teams for hackathons, projects, research and competitions with open roles and required skills. Admin approval, apply in a few clicks, duplicate prevention, accept/reject, invitations, auto-close when full, auto-expire after the deadline. |
+| **Teams** | Team page, members, leave/remove, automatic team chat, and a **skill-gap analyzer** (coverage %, missing skills, suggested students to invite). |
+| **Messaging** | Connections, real-time 1:1 and team chat (Socket.IO) with read receipts and typing indicator, block and report. |
+| **Notifications** | Live in-app notifications for applications, decisions, invitations, connections, messages and 48 h deadline reminders, plus optional email (Brevo). |
+| **Admin** | Stats and activity, post approval queue, reports (dismiss/remove/warn/ban), user management, skill catalogue, categories, verified domains, audit log. |
+| **UX** | Landing page, dark/light themes, responsive from 360 px, loading skeletons, empty and error states, Privacy and Terms pages. |
+
+### How matching works
+
+Each part is scored from 0 to 1 and weighted:
+
+| Part | Weight | Meaning |
 |---|---|---|
-| Accounts | Email + password registration, 6-digit email OTP, **Continue with Google**, account linking by email, password reset (15-min link), 5-attempt / 15-min lockout, 24 h sessions, rate limiting | FR1–FR4, QR20–QR24 |
-| Verification | "Verified Student" badge for institutional domains (`thapar.edu`, `*.ac.in`, `*.edu.in`, `*.edu` … admin-managed); unverified users can't post or apply | FR2 |
-| Profiles | Name, photo (compressed ≤ 0.5 MB), college, branch, year, bio, headline, interests, preferred roles, availability, "skills I want in teammates", projects, achievements; one-page edit with required fields marked; draft kept if saving fails | FR5, QR3, QR9, QR12 |
-| GitHub | Connect via GitHub OAuth (verified) **or** username/profile link; **all** public repos (no limit) with languages, topics, stars, forks, URL, last updated; refresh; up to 6 featured; disconnect/change; 24 h cache; last saved data shown if GitHub is down | FR6, QR11, QR18 |
-| Skills | Detected from languages, topics, dependency manifests (package.json, requirements.txt, pom.xml, build.gradle, go.mod, Cargo.toml, …) and config files; **all** shown as categorised *suggestions with evidence*; confirm/reject (one or all); add/edit/remove/search; proficiency levels; GitHub vs manual clearly marked; sync never deletes manual skills | Prompt §6 |
-| Matching | `50% skill + 20% interest + 15% role + 15% availability`, each normalised to 0–1, missing parts re-weighted; gauge, component bars, matched / missing / required skills and a plain-English reason everywhere | FR9 |
-| Discover | Search by name/skill; filters for skills, interests, college, year, role, availability (every result matches all filters); match against your profile or one of your teams' missing skills; connect / message | FR7, QR4, QR14 |
-| Team Finder | Create posts (title, description, event, type, domains, deadline, team size, commitment, required skills, open roles/positions); admin approval; browse/search/filter/sort by match; apply in ≤ 3 clicks; duplicate prevention (DB unique index); withdraw; accept/reject; atomic capacity (transaction); auto-close when full, auto-expire after deadline; edit, close, reopen, delete | FR8, FR10, FR11, FR16–FR18, QR2 |
-| Teams | Team page, remove member (+1 open position), leave, team invitations, **skill gap analyzer** (coverage %, who covers what, missing skills, top-5 / all suggested students ranked by fit, invite) | FR18, FR19 |
-| Communication | Collaboration requests & connections, real-time 1:1 and team chat (Socket.IO) with read receipts and typing indicator, block, report | FR12, FR13, FR15, QR8 |
-| Notifications | In-app (live bell + page) for applications, decisions, approvals, requests, invitations, messages, 48 h deadline reminders; email via Brevo (user can switch off) | FR14 |
-| Admin | Stats & 14-day activity, post approval queue (approve/reject with reason/remove), reports (dismiss/remove content/warn/ban), users (activate/deactivate/ban/make admin/warn), skill catalogue, categories, roles, interests, verified domains, audit log | FR20–FR23 |
-| UX | Landing page, dark & light themes, responsive 360–1920 px, loading skeletons, empty states, error states with retry, toasts | QR1, QR6, QR13 |
+| Skills | 50% | Share of the required skills the person has |
+| Interests | 20% | Overlap of domains (AI/ML, web, fintech, …) |
+| Role | 15% | Whether they want the open role |
+| Availability | 15% | Their hours/week compared with what the team needs |
+
+If one side has no data for a part, that part is left out and the rest is rescaled, so scores stay fair. The same code (`packages/shared`) runs on the server and in the browser, and it is unit-tested.
+
+---
+
+## Tech stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React 18, Vite 6, Tailwind CSS 4, TanStack Query, React Router 7, Framer Motion, Socket.IO client |
+| Backend | Node.js 22, Express 5, Mongoose 8, Socket.IO 4, zod, bcrypt, helmet (CSP), express-rate-limit |
+| Database | MongoDB Atlas (replica set, for transactions) |
+| Auth & APIs | Google OAuth 2.0 (PKCE), GitHub OAuth + GitHub GraphQL/REST, Brevo email API |
+| Testing & CI | Jest + Supertest (35 tests), strict TypeScript, GitHub Actions |
+| Hosting | Render (free web service), configured by `render.yaml` |
+
+**By the numbers:** 26 MongoDB collections · 106 REST endpoints · 27 pages · ~13,000 lines of TypeScript · 35 automated tests.
 
 ---
 
@@ -42,8 +85,7 @@ partner-in-project/
 │  │     ├─ scripts/       seed, demo data, make-admin
 │  │     └─ tests/         integration tests (Jest + Supertest)
 │  └─ web/                 React 18 + Vite + Tailwind CSS 4 (TypeScript)
-│     └─ src/pages, components, lib
-├─ packages/shared/        Match engine, skill-gap analyzer, skill extraction rules, catalogue, zod schemas (+ unit tests)
+├─ packages/shared/        Match engine, skill-gap analyzer, skill extraction, catalogue, zod schemas (+ unit tests)
 ├─ docs/                   API, database, deployment, testing
 ├─ .github/workflows/      CI, hourly cron, daily backup
 └─ render.yaml             Render blueprint (free web service)
@@ -51,24 +93,22 @@ partner-in-project/
 
 ---
 
-## Run it locally (macOS)
+## Run it locally
 
-Requirements: **Node.js 20.11+** (22 recommended) and a MongoDB **replica set** (MongoDB Atlas free cluster works — transactions need a replica set).
+Requirements: **Node.js 20.11+** (22 recommended) and a MongoDB **replica set**. A free MongoDB Atlas cluster works.
 
 ```bash
-git clone https://github.com/<you>/partner-in-project.git
+git clone https://github.com/bhargavchetanya/partner-in-project.git
 cd partner-in-project
 npm install
-cp .env.example .env          # then edit .env — at minimum set MONGODB_URI and ADMIN_EMAILS
+cp .env.example .env          # then set at least MONGODB_URI and ADMIN_EMAILS
 npm run seed:demo             # optional: 12 demo students + 5 team posts
 npm run dev                   # API on :4000, web app on http://localhost:5173
 ```
 
-Open http://localhost:5173. Without Brevo configured, OTP codes and reset links are shown in the UI (development only) and printed in the terminal. Google/GitHub buttons work once their keys are in `.env`.
-
-Demo accounts (after `npm run seed:demo`): `ananya@demo.partnerinproject.app` … password `DemoPass#2026`.
-
-Make yourself admin: put your email in `ADMIN_EMAILS` and log in, or run `npm run make-admin -w apps/api -- you@example.com`.
+- Without Brevo configured, OTP codes and reset links are printed in the terminal (development only).
+- Google and GitHub sign-in work once their keys are in `.env` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+- To make yourself admin, put your email in `ADMIN_EMAILS` and log in, or run `npm run make-admin -w apps/api -- you@example.com`.
 
 ---
 
@@ -76,26 +116,32 @@ Make yourself admin: put your email in `ADMIN_EMAILS` and log in, or run `npm ru
 
 ```bash
 npm test                      # shared unit tests + API integration tests
+npm run typecheck             # strict TypeScript across all packages
 ```
 
-- `packages/shared` — match score (incl. the 4/5 = 80 % example and the re-weighting rule), skill gap, every manifest parser and skill extraction (QR26).
-- `apps/api` — auth (registration, duplicate email, bcrypt, lockout, reset), admin-only access, full team flow (post → approval → match → apply → duplicate → accept → skill gap → auto-close → remove member), **concurrent accepts for the last slot**, messaging/blocking, notifications, reports & bans, discover filters, and GitHub sync rules with the GitHub API mocked.
+- **packages/shared:** match score and re-weighting, skill gap, every manifest parser and skill extraction.
+- **apps/api:** auth (registration, restarting an unverified sign-up, duplicate email, bcrypt, lockout, reset), admin-only access, the full team flow (post → approval → apply → accept → skill gap → auto-close), **concurrent accepts for the last slot**, messaging and blocking, notifications, reports and bans, discover filters, and GitHub sync with the GitHub API mocked.
 
-The API tests need a MongoDB replica set: set `MONGODB_URI_TEST` (e.g. an Atlas URI with database `pip-test`). See [docs/TESTING.md](docs/TESTING.md).
+The API tests need a MongoDB replica set via `MONGODB_URI_TEST`. See [docs/TESTING.md](docs/TESTING.md).
 
 ---
 
 ## Deployment (free)
 
-One Render free web service (API + WebSockets + React app on the same origin) + MongoDB Atlas free cluster + Brevo free email + GitHub Actions for the hourly job and daily backups. Step-by-step: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
+One Render web service serves the API, WebSockets and the React app from a single URL. It uses a MongoDB Atlas free cluster, Brevo for email, Google and GitHub OAuth, and GitHub Actions for CI, an hourly reminder job and daily database backups. Secrets are set in the Render dashboard and are never committed.
+
+Step-by-step guide: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**
 
 ## More docs
 
-- [docs/API.md](docs/API.md) — REST + Socket.IO reference
-- [docs/DATABASE.md](docs/DATABASE.md) — collections, fields, constraints
-- [docs/TESTING.md](docs/TESTING.md) — test plan and how to run everything
-- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — accounts, keys, callback URLs, verification checklist
+- [docs/API.md](docs/API.md): REST + Socket.IO reference
+- [docs/DATABASE.md](docs/DATABASE.md): collections, fields, constraints
+- [docs/TESTING.md](docs/TESTING.md): test plan and how to run everything
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): accounts, keys, callback URLs, verification checklist
+
+---
 
 ## Team
 
-Chetanya (1024030027) · Memansi (1024030006) · Harschelle (1024030039) — Batch 3C35
+Chetanya Bhargav (1024030027) · Memansi (1024030006) · Harschelle (1024030039)
+Batch 3C35 · UCS503 Software Engineering Lab · Thapar Institute of Engineering & Technology
