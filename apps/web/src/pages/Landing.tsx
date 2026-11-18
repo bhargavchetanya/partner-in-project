@@ -265,6 +265,7 @@ export function Landing() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-[13px] text-muted sm:flex-row sm:px-8">
           <Logo />
           <p>Built for UCS503 Software Engineering Lab · Thapar Institute of Engineering &amp; Technology</p>
+          <div className="flex gap-4"><Link to="/privacy" className="hover:text-fg">Privacy</Link><Link to="/terms" className="hover:text-fg">Terms</Link></div>
         </div>
       </footer>
     </div>

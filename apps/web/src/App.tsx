@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { AppShell, GuestOnly, RequireAuth } from './components/layout';
 import { PageLoader } from './components/ui';
 import { Landing } from './pages/Landing';
+import { Privacy, Terms } from './pages/Legal';
 import { Login, Register, VerifyEmail, ForgotPassword, ResetPassword } from './pages/Auth';
 import { NotFound } from './pages/NotFound';
 
@@ -41,6 +42,8 @@ export function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
           <Route path="/register" element={<GuestOnly><Register /></GuestOnly>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
