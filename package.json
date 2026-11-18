@@ -1,0 +1,26 @@
+{
+  "name": "partner-in-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Partner in Project — student project & hackathon collaboration platform (UCS503 Software Engineering Lab)",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build": "npm run build -w apps/web && npm run build -w apps/api",
+    "start": "npm run start -w apps/api",
+    "test": "npm test -w packages/shared && npm test -w apps/api",
+    "typecheck": "npm run typecheck -w packages/shared && npm run typecheck -w apps/api && npm run typecheck -w apps/web",
+    "seed": "npm run seed -w apps/api",
+    "seed:demo": "npm run seed:demo -w apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}

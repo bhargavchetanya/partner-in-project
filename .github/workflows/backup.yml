@@ -1,0 +1,33 @@
+# Daily MongoDB backup (QR15): dump stored as a workflow artifact, kept for 7 days.
+# Keep the repository PRIVATE so only you can download backups.
+# Needs repository secret MONGODB_URI (same as on Render).
+# Restore: download the artifact, unzip, then
+#   mongorestore --uri "<MONGODB_URI>" --gzip --archive=backup.archive.gz --drop
+name: Daily backup
+
+on:
+  schedule:
+    - cron: '43 20 * * *' # 02:13 IST
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install MongoDB Database Tools
+        run: |
+          wget -q https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb
+          sudo apt-get install -y ./mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb
+      - name: Dump database
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          if [ -z "$MONGODB_URI" ]; then echo "MONGODB_URI secret not set — skipping"; exit 0; fi
+          mongodump --uri "$MONGODB_URI" --gzip --archive=backup.archive.gz
+          ls -lh backup.archive.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mongodb-backup-${{ github.run_id }}
+          path: backup.archive.gz
+          retention-days: 7
+          if-no-files-found: ignore

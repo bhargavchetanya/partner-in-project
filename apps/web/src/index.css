@@ -1,0 +1,175 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root,
+[data-theme='dark'] {
+  --bg: #0a0d18;
+  --bg-elev: #0e1222;
+  --surface: #121730;
+  --surface-2: #181e3a;
+  --surface-3: #202749;
+  --border: #252c4c;
+  --border-strong: #343d66;
+  --text: #e9ecf7;
+  --text-2: #b9c0da;
+  --muted: #8189a8;
+  --primary: #8b7bff;
+  --primary-strong: #7464f5;
+  --primary-soft: rgba(139, 123, 255, 0.14);
+  --accent: #2dd4bf;
+  --accent-soft: rgba(45, 212, 191, 0.13);
+  --warn: #f5b04c;
+  --warn-soft: rgba(245, 176, 76, 0.13);
+  --danger: #f2556b;
+  --danger-soft: rgba(242, 85, 107, 0.13);
+  --success: #34d399;
+  --glow-1: rgba(124, 108, 255, 0.28);
+  --glow-2: rgba(45, 212, 191, 0.16);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 40px -12px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #f6f7fc;
+  --bg-elev: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f2f4fb;
+  --surface-3: #e8ebf6;
+  --border: #e2e5f0;
+  --border-strong: #cdd2e4;
+  --text: #121629;
+  --text-2: #3b4263;
+  --muted: #6a7293;
+  --primary: #5b4cf0;
+  --primary-strong: #4a3be0;
+  --primary-soft: rgba(91, 76, 240, 0.1);
+  --accent: #0d9488;
+  --accent-soft: rgba(13, 148, 136, 0.1);
+  --warn: #b7791f;
+  --warn-soft: rgba(183, 121, 31, 0.12);
+  --danger: #dc2648;
+  --danger-soft: rgba(220, 38, 72, 0.09);
+  --success: #059669;
+  --glow-1: rgba(91, 76, 240, 0.14);
+  --glow-2: rgba(13, 148, 136, 0.1);
+  --shadow: 0 1px 2px rgba(18, 22, 41, 0.04), 0 10px 30px -14px rgba(18, 22, 41, 0.18);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-elev: var(--bg-elev);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-fg-2: var(--text-2);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --shadow-card: var(--shadow);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--primary-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+}
+
+.glow {
+  background:
+    radial-gradient(600px 300px at 15% -10%, var(--glow-1), transparent 70%),
+    radial-gradient(500px 280px at 90% 0%, var(--glow-2), transparent 70%);
+}
+
+.text-gradient {
+  background: linear-gradient(100deg, var(--primary) 10%, var(--accent) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Grid & flex children may shrink below their content width (prevents horizontal scroll on phones). */
+.grid > * {
+  min-width: 0;
+}

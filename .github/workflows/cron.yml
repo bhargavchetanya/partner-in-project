@@ -1,0 +1,23 @@
+# Hourly job (free): expires posts past their deadline and sends 48-hour deadline reminders.
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   APP_URL      e.g. https://partner-in-project.onrender.com
+#   CRON_SECRET  same value as the CRON_SECRET environment variable on Render
+name: Hourly jobs
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/internal/cron
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then echo "Secrets not set yet — skipping"; exit 0; fi
+          # The free Render service may be asleep; allow time for it to wake up.
+          curl -fsS --retry 5 --retry-delay 20 --max-time 120 -X POST -H "x-cron-secret: $CRON_SECRET" "$APP_URL/api/internal/cron"
