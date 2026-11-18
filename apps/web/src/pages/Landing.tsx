@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, BadgeCheck, Briefcase, Check, Github, MessageSquare, Radar, ShieldCheck, Sparkles, Target, Users, X, Zap,
 } from 'lucide-react';
-import { Logo } from '@/components/layout';
+import { Logo, useLogout } from '@/components/layout';
 import { ButtonLink, Chip } from '@/components/ui';
 import { MatchGauge } from '@/components/match';
 import { useMe, useTheme, useDocumentTitle } from '@/lib/hooks';
@@ -110,6 +110,9 @@ export function Landing() {
   const { data } = useMe();
   const user = data?.user;
   const { theme, toggle } = useTheme();
+  const logout = useLogout('/');
+  const unfinished = !!user && (!user.emailVerified || !user.profileComplete);
+  const resumeTo = user && !user.emailVerified ? '/verify-email' : '/dashboard';
   return (
     <div className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[780px] glow" />
@@ -127,7 +130,10 @@ export function Landing() {
             {theme === 'dark' ? <Sun className="size-4.5" /> : <Moon className="size-4.5" />}
           </button>
           {user ? (
-            <ButtonLink to="/dashboard" size="sm">Open dashboard</ButtonLink>
+            <>
+              <button onClick={() => logout.mutate()} className="hidden px-3 text-sm font-medium text-fg-2 hover:text-fg sm:block">Log out</button>
+              <ButtonLink to={resumeTo} size="sm">{unfinished ? 'Finish sign-up' : 'Open dashboard'}</ButtonLink>
+            </>
           ) : (
             <>
               <Link to="/login" className="hidden px-3 text-sm font-medium text-fg-2 hover:text-fg sm:block">Log in</Link>
@@ -152,13 +158,19 @@ export function Landing() {
             Partner in Project matches students by real skills and GitHub work, shows exactly why someone is a good fit, and tells your team which skills it is still missing.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-9 flex flex-wrap items-center gap-3">
-            <ButtonLink to={user ? '/dashboard' : '/register'} size="lg" icon={<Zap className="size-4" />}>
-              {user ? 'Go to dashboard' : 'Create your profile — free'}
+            <ButtonLink to={user ? resumeTo : '/register'} size="lg" icon={<Zap className="size-4" />}>
+              {user ? (unfinished ? 'Finish your profile' : 'Go to dashboard') : 'Create your profile — free'}
             </ButtonLink>
             <ButtonLink to={user ? '/opportunities' : '/login'} size="lg" variant="outline">
               Browse teams <ArrowRight className="size-4" />
             </ButtonLink>
           </motion.div>
+          {user && (
+            <p className="mt-4 text-[13px] text-muted">
+              Signed in as <span className="text-fg-2">{user.email}</span>.{' '}
+              <button onClick={() => logout.mutate()} className="font-medium text-primary hover:underline">Not you? Log out</button>
+            </p>
+          )}
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-muted">
             <span className="flex items-center gap-1.5"><Check className="size-4 text-accent" /> Continue with Google</span>
             <span className="flex items-center gap-1.5"><Check className="size-4 text-accent" /> All public repos, no limits</span>

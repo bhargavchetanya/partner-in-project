@@ -9,7 +9,8 @@ import { api, errorMessage, fieldErrors } from '@/lib/api';
 import { useCatalog, useDocumentTitle } from '@/lib/hooks';
 import type { FullProfile, MeResponse } from '@/lib/types';
 import { YEAR_LABELS } from '@/lib/utils';
-import { Logo } from '@/components/layout';
+import { Logo, useLogout } from '@/components/layout';
+import { useMe } from '@/lib/hooks';
 import { Avatar, Button, Card, CardHeader, ErrorState, Field, Input, PageHeader, PageLoader, Select, Textarea } from '@/components/ui';
 import { ChipSelect, SkillPicker } from '@/components/pickers';
 
@@ -31,6 +32,28 @@ interface FormState {
 }
 
 const DRAFT_KEY = 'pip-profile-draft';
+
+function OnboardingAccountBar() {
+  const { data } = useMe();
+  const logout = useLogout('/register');
+  const email = data?.user?.email;
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <Logo />
+      <div className="flex items-center gap-3 text-[13px] text-muted">
+        {email && <span className="hidden sm:inline">Signed in as <span className="text-fg-2">{email}</span></span>}
+        <button
+          type="button"
+          onClick={() => logout.mutate()}
+          disabled={logout.isPending}
+          className="rounded-lg border border-line px-3 py-1.5 font-medium text-fg-2 hover:bg-surface-2 hover:text-fg"
+        >
+          Use a different account
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function EditProfile({ onboarding }: { onboarding?: boolean }) {
   useDocumentTitle(onboarding ? 'Set up your profile' : 'Edit profile');
@@ -238,7 +261,7 @@ export default function EditProfile({ onboarding }: { onboarding?: boolean }) {
       <div className="min-h-dvh">
         <div className="pointer-events-none fixed inset-x-0 top-0 h-80 glow" />
         <div className="relative mx-auto max-w-3xl px-4 py-8 sm:px-6">
-          <Logo />
+          <OnboardingAccountBar />
           <div className="mt-10">
             <PageHeader eyebrow="Step 1 of 2" title="Set up your profile" subtitle="This is what other students see when deciding to team up with you. You can change it any time." />
             {content}

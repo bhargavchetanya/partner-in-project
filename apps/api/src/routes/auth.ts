@@ -86,18 +86,38 @@ export async function sessionPayload(user: UserDoc) {
 authRouter.post('/register', authLimiter, async (req, res) => {
   const input = parse(registerSchema, req.body);
   const existing = await User.findOne({ email: input.email });
-  if (existing) {
+  if (existing && (existing.emailVerified || existing.googleId)) {
     // QR23: ask to log in or use another email
     throw conflict('This email is already registered. Log in instead, or use a different email address.', 'EMAIL_TAKEN');
   }
-  const user = new User({
-    email: input.email,
-    name: input.name,
-    passwordHash: await bcrypt.hash(input.password, 12), // QR20
-  });
-  applyAdminBootstrap(user);
-  await user.save();
-  await Profile.create({ userId: user._id, name: input.name, college: input.college });
+  let user;
+  if (existing) {
+    // A sign-up that was abandoned before the email was verified: let the person start again.
+    // The account was never usable (verification is required), and nobody can finish this
+    // sign-up without access to the inbox, so overwriting it is safe.
+    existing.name = input.name;
+    existing.passwordHash = await bcrypt.hash(input.password, 12);
+    existing.failedLogins = 0;
+    existing.lockUntil = null as unknown as Date;
+    applyAdminBootstrap(existing);
+    await existing.save();
+    await Session.deleteMany({ userId: existing._id });
+    await Profile.updateOne(
+      { userId: existing._id },
+      { $set: { name: input.name, college: input.college } },
+      { upsert: true },
+    );
+    user = existing;
+  } else {
+    user = new User({
+      email: input.email,
+      name: input.name,
+      passwordHash: await bcrypt.hash(input.password, 12), // QR20
+    });
+    applyAdminBootstrap(user);
+    await user.save();
+    await Profile.create({ userId: user._id, name: input.name, college: input.college });
+  }
   await refreshProfileDerived(user._id);
   const code = await issueOtp(user);
   await startSession(req, res, user);

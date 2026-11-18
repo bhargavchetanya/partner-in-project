@@ -91,11 +91,24 @@ function GlobalSearch({ className, onDone }: { className?: string; onDone?: () =
   );
 }
 
+/** Logs out, clears all cached data and the onboarding draft, then goes to `to`. */
+export function useLogout(to = '/login') {
+  const qc = useQueryClient();
+  const nav = useNavigate();
+  return useMutation({
+    mutationFn: () => api.post('/auth/logout'),
+    onSuccess: () => {
+      qc.clear();
+      try { sessionStorage.clear(); } catch { /* ignore */ }
+      nav(to);
+      toast.success('Logged out');
+    },
+  });
+}
+
 function ProfileMenu() {
   const user = useUser()!;
   const { theme, toggle } = useTheme();
-  const qc = useQueryClient();
-  const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -103,14 +116,7 @@ function ProfileMenu() {
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
-  const logout = useMutation({
-    mutationFn: () => api.post('/auth/logout'),
-    onSuccess: () => {
-      qc.clear();
-      nav('/login');
-      toast.success('Logged out');
-    },
-  });
+  const logout = useLogout();
   const items: { to: string; label: string; icon: typeof User }[] = [
     { to: '/profile', label: 'My profile', icon: User },
     { to: '/skills', label: 'Skills', icon: Sparkles },

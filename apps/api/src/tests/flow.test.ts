@@ -68,10 +68,6 @@ describe('auth (FR1–FR4, QR20–QR23)', () => {
     expect(ok.status).toBe(201);
     expect(ok.body.user.emailVerified).toBe(false);
 
-    const dup = await request(app).post('/api/auth/register').send({ name: 'Xi', email: 'ADITI@thapar.edu', password: 'password123', college: 'TIET' });
-    expect(dup.status).toBe(409);
-    expect(dup.body.error.code).toBe('EMAIL_TAKEN');
-
     // Password stored only as bcrypt hash (QR20)
     const u = await mongoose.connection.db!.collection('users').findOne({ email: 'aditi@thapar.edu' });
     expect(u!.passwordHash).toMatch(/^\$2[aby]\$12\$/);
@@ -81,10 +77,27 @@ describe('auth (FR1–FR4, QR20–QR23)', () => {
     expect(post.status).toBe(403);
     expect(post.body.error.code).toBe('EMAIL_NOT_VERIFIED');
 
+    // An abandoned (never verified) sign-up can be started again with the same email
+    const again = request.agent(app);
+    const restart = await again.post('/api/auth/register').send({ name: 'Aditi R', email: 'ADITI@thapar.edu', password: 'password123', college: 'TIET' });
+    expect(restart.status).toBe(201);
+    expect(restart.body.user.name).toBe('Aditi R');
+    expect(await mongoose.connection.db!.collection('users').countDocuments({ email: 'aditi@thapar.edu' })).toBe(1);
+    // the old half-finished session was signed out
+    expect((await agent.get('/api/auth/me')).body.user ?? null).toBeNull();
+    // the old code no longer works; the new one does
+    const stale = await again.post('/api/auth/verify-email').send({ email: 'aditi@thapar.edu', code: ok.body.devCode });
+    if (ok.body.devCode !== restart.body.devCode) expect(stale.status).toBe(400);
+
     // Verify -> institutional badge
-    const v = await agent.post('/api/auth/verify-email').send({ email: 'aditi@thapar.edu', code: ok.body.devCode });
+    const v = await again.post('/api/auth/verify-email').send({ email: 'aditi@thapar.edu', code: restart.body.devCode });
     expect(v.body.user.emailVerified).toBe(true);
     expect(v.body.user.institutionVerified).toBe(true);
+
+    // Once verified, the email is taken (QR23)
+    const dup = await request(app).post('/api/auth/register').send({ name: 'Xi', email: 'ADITI@thapar.edu', password: 'password123', college: 'TIET' });
+    expect(dup.status).toBe(409);
+    expect(dup.body.error.code).toBe('EMAIL_TAKEN');
 
     // Lockout after 5 failures (QR22)
     for (let i = 0; i < 4; i++) {
