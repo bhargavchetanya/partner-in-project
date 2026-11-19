@@ -1,4 +1,4 @@
-# Partner in Project
+# Partner in Project.
 
 **Find teammates who actually fit.** A platform that helps students across colleges find teammates for projects, hackathons and research, matched by real skills and GitHub work.
 
